@@ -37,6 +37,27 @@
                     <label for="endTime" class="block text-gray-700 font-bold mb-2">Hora fin:</label>
                     <input type="time" name="endTime" class="border rounded w-full">
                 </div>
+                <div class="mb-4">
+                    <label for="days" class="block text-gray-700 font-bold mb-2">Días:</label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Mon"> Lunes
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Tue"> Martes
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Wed"> Miércoles
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Thur"> Jueves
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Fri"> Viernes
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Sat"> Sábado
+                    </label>
+                </div>
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                     Agregar Horario
                 </button>
@@ -51,6 +72,7 @@
                         <th class="border px-4 py-2">Profesor</th>
                         <th class="border px-4 py-2">Hora inicio</th>
                         <th class="border px-4 py-2">Hora fin</th>
+                        <th class="border px-4 py-2">Días</th>
                         <th class="border px-4 py-2">Acciones</th>
                     </tr>
                 </thead>
@@ -61,6 +83,7 @@
                             <td class="border px-4 py-2">{{ $hr->teacher->name }}</td>
                             <td class="border px-4 py-2">{{ $hr->start_time }}</td>
                             <td class="border px-4 py-2">{{ $hr->end_time }}</td>
+                            <td class="border px-4 py-2">{{ $hr->days }}</td>
                             <td class="border px-4 py-2">
                                 <a href="{{ route('edit.horario', $hr->id) }}" class="text-blue-500 hover:text-blue-700">
                                     Editar

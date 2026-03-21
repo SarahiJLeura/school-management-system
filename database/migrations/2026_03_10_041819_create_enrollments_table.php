@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->timestamp('enrolled_at');
+            $table->timestamp('enrolled_at')->useCurrent();
             $table->timestamps();
         });
     }

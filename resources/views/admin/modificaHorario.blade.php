@@ -37,6 +37,27 @@
                     <label for="endTime" class="block text-gray-700 font-bold mb-2">Hora fin:</label>
                     <input type="time" name="endTime" class="border rounded w-full" value="{{ $horario->end_time }}">
                 </div>
+                <div class="mb-4">
+                    <label for="days" class="block text-gray-700 font-bold mb-2">Días:</label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Mon"> Lunes
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Tue"> Martes
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Wed"> Miércoles
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Thur"> Jueves
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Fri"> Viernes
+                    </label>
+                    <label>
+                        <input type="checkbox" name="days[]" value="Sat"> Sábado
+                    </label>
+                </div>
                 <a href="/horarios" class="bg-red-500 text-white font-bold py-2 px-4 rounded mt-4">
                     Cancelar
                 </a>

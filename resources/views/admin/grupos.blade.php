@@ -14,7 +14,7 @@
                     <select name="scheduleId" class="border rounded w-full">
                         @foreach($schedules as $hr)
                             <option value="{{ $hr->id }}">
-                                {{ $hr->course->name }} | {{ $hr->teacher->name }} | {{ $hr->start_time }} - {{ $hr->end_time }}
+                                {{ $hr->course->name }} | {{ $hr->teacher->name }} | {{ $hr->start_time }} - {{ $hr->end_time }} | {{ $hr->days }}
                             </option>
                         @endforeach
                     </select>
@@ -34,6 +34,7 @@
                         <th class="border px-4 py-2">Profesor</th>
                         <th class="border px-4 py-2">Hora inicio</th>
                         <th class="border px-4 py-2">Hora fin</th>
+                        <th class="border px-4 py-2">Días</th>
                         <th class="border px-4 py-2">Acciones</th>
                     </tr>
                 </thead>
@@ -45,6 +46,7 @@
                         <td class="border px-4 py-2">{{ $gr->schedule->teacher->name }}</td>
                         <td class="border px-4 py-2">{{ $gr->schedule->start_time }}</td>
                         <td class="border px-4 py-2">{{ $gr->schedule->end_time }}</td>
+                        <td class="border px-4 py-2">{{ $gr->schedule->days }}</td>
                         <td class="border px-4 py-2">
                             <a href="{{ route('edit.grupo', $gr->id) }}" class="text-blue-500 hover:text-blue-700 mr-2">Editar</a>
                             <form action="{{ route('delete.grupo', $gr->id) }}" method="POST" style="display:inline;">

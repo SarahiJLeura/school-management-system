@@ -10,6 +10,15 @@ use App\Models\schedule;
 use App\Models\User;
 use App\Models\grade;
 
+/**
+ * Controller for Administrator where he can implement a CRUD (Create, Read, Update, Delete) with all modules.
+ * There are 5 kind of functions:
+ * - index -> returns module page
+ * - save -> inserts into database the respective data
+ * - edit -> displays another module with the information that will be updated
+ * - update -> updates into database the respective information
+ * - delete -> deletes the selected item into database
+ */
 class AdminController extends Controller
 {
     /**
@@ -78,6 +87,7 @@ class AdminController extends Controller
         $nuevoHorario->end_time = $request->endTime;
         $nuevoHorario->course_id = $request->courseId;
         $nuevoHorario->teacher_id = $request->teacherId;
+        $nuevoHorario->days = implode(',', $request->days);
         $nuevoHorario->save();
         return redirect()->back();
     }
@@ -106,6 +116,7 @@ class AdminController extends Controller
             $horarioEditar->end_time = $request->endTime;
             $horarioEditar->course_id = $request->courseId;
             $horarioEditar->teacher_id = $request->teacherId;
+            $horarioEditar->days = implode(',', $request->days);
             $horarioEditar->save();
         }else{
             return redirect()->back()->withErrors('No se encontro el horario');
@@ -147,6 +158,143 @@ class AdminController extends Controller
         }
         return redirect('/grupos');
     }
+
+    /**
+     * *
+     * * *
+     * * * * CALIFICACIONES
+     * * *
+     * *
+     */
+
+    public function indexCalificacion(Request $request){
+        $groups = group::with('schedule.course', 'schedule.teacher')->get();
+        $groupId = $request->group_filter;
+        $enrollments = collect();
+        if ($groupId) {
+            // Traer inscripciones del grupo seleccionado
+            $enrollments = Enrollment::with('user', 'group.schedule.course')
+                ->where('group_id', $groupId)
+                ->get();
+        }
+        return view('admin.calificaciones', compact('groups', 'enrollments', 'groupId'));
+    }
+
+    public function saveCalificacion(Request $request){
+        $request->validate([
+            'enrollment_id' => 'required|exists:enrollments,id',
+            'grade' => 'required|numeric|min:0|max:100',
+        ]);
+        grade::create([
+            'enrollment_id' => $request->enrollment_id,
+            'grade' => $request->grade,
+        ]);
+        return redirect()->back()->with('success', 'Calificación guardada correctamente');
+    }
+
+    public function deleteCalificacion($id){
+        $gradeDelete = grade::find($id);
+        if ($gradeDelete != null){
+            $gradeDelete->delete();
+        }else{
+            return redirect()->back()->withErrors('No se encontro la calificacion');
+        }
+        return redirect()->back();
+    }
+
+    public function editCalificacion($id){
+        $gradeEdit = Grade::with('enrollment.user', 'enrollment.group.schedule.course')->findOrFail($id);
+        $groups = Group::with('schedule.course', 'schedule.teacher')->get();
+        return view('admin.modificaCalificacion', compact('gradeEdit', 'groups'));
+    }
+
+    public function updateCalificacion(Request $request, $id){
+        $request->validate([
+            'grade' => 'required|numeric|min:0|max:100',
+        ]);
+        $gradeEdit = grade::find($id);
+        if ($gradeEdit != null){
+            $gradeEdit->grade = $request->grade;
+            $gradeEdit->save();
+        }else{
+            return redirect()->back()->withErrors('No se encontro la calificacion');
+        }
+        return redirect()->route('index.calificaciones')->with('success', 'Calificación actualizada');
+    }
+
+    /**
+     * *
+     * * *
+     * * * * INSCRIPCIONES
+     * * *
+     * *
+     */
+
+    public function indexInscripciones(Request $request){
+        $groups = group::with('schedule.course', 'schedule.teacher')->get();
+        // grupo seleccionado
+        $groupId = $request->group_filter;
+        //usuarios solo si hay un grupo seleccionado
+        if ($groupId) {
+            $users = User::whereDoesntHave('enrollments', function ($query) use ($groupId) {
+                $query->where('group_id', $groupId);
+            })->get();
+        } else {
+            $users = collect();
+        }
+        // inscripciones para tabla
+        $enrollments = enrollment::with('user', 'group.schedule.course', 'group.schedule.teacher');
+        if ($groupId) {
+            $enrollments->where('group_id', $groupId);
+        }
+        $enrollments = $enrollments->get();
+        return view('admin.inscripciones', compact('groups', 'users', 'enrollments', 'groupId'));
+    }
+
+    public function saveInscripcion(Request $request){
+        $newEnrollment = new enrollment();
+        $newEnrollment->user_id = $request->user_id;
+        $newEnrollment->group_id = $request->group_id;
+        $newEnrollment->save();
+        return redirect()->back();
+    }
+
+    public function deleteInscripcion($idx){
+        $enrollDelete = enrollment::find($idx);
+        if ($enrollDelete != null){
+            $enrollDelete->delete();
+        }else{
+            return redirect()->back()->withErrors('No se encontro la inscripcion');
+        }
+        return redirect()->back();
+    }
+
+    public function editInscripcion($id){
+        $enrollEdit = enrollment::with('group.schedule.course', 'group.schedule.teacher')
+            ->findOrFail($id);
+
+        $groups = group::with('schedule.course', 'schedule.teacher')->get();
+
+        // usuarios disponibles + el actual
+        $users = User::where(function ($query) use ($enrollEdit) {
+            $query->whereDoesntHave('enrollments', function ($q) use ($enrollEdit) {
+                $q->where('group_id', $enrollEdit->group_id);
+            })
+            ->orWhere('id', $enrollEdit->user_id);
+        })->get();
+
+        return view('admin.modificaInscripcion', compact('enrollEdit', 'groups', 'users'));
+    }
+
+    public function updateInscripcion(Request $request, $id){
+        $enrollEdit = enrollment::find($id);
+        if ($enrollEdit != null){
+            $enrollEdit->user_id = $request->user_id;
+            $enrollEdit->group_id = $request->group_id;
+            $enrollEdit->save();
+        }else{
+            return redirect()->back()->withErrors('No se encontro la calificacion');
+        }
+        return redirect('/inscripciones');
+    }
 }
-
-

@@ -18,6 +18,8 @@
                 <li><a href="{{ route('index.materias') }}">Materias</a></li>
                 <li><a href="{{ route('index.horarios') }}">Horarios</a></li>
                 <li><a href="{{ route('index.grupos') }}">Grupos</a></li>
+                <li><a href="{{ route('index.inscripciones') }}">Inscripciones</a></li>
+                <li><a href="{{ route('index.calificaciones') }}">Calificaciones</a></li>
                 <form action="{{ route('logout') }}" method="post">
                     @csrf
                     <button type="submit">Log out</button>
